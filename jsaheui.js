@@ -61,7 +61,7 @@ function chogi(){ //initialize
 	meomchum = true;
 	clearTimeout(timer);
 
-	input_buffer = "";
+	input_buffer = document.forms[0].input.value;
 
 	x = 0; dx = 0;
 	y = 0; dx = 0;
