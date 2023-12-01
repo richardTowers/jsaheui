@@ -10,6 +10,12 @@ msg_input_number = "Type a number. Type !!! to pause the execution.";
 msg_input_character = "Type a character or more. Type !!! to pause the execution.";
 </script>
 <script type="text/javascript" src="jsaheui.js"></script>
+<style>
+textarea {
+  font-family: Georgia, serif;
+  font-size: 32px;
+}
+</style>
 </head>
 
 <body>
@@ -18,18 +24,18 @@ msg_input_character = "Type a character or more. Type !!! to pause the execution
 <table>
 <tr>
 <td valign="top">
-<textarea name="aheui" rows="20" cols="80" style="scrollbar=both;"></textarea><br/>
+<textarea name="aheui" rows="10" cols="40" style="scrollbar=both;"></textarea><br/>
 <input type="button" value="init" onclick='javascript:chogi();'>
 <input type="button" value="run" onclick='javascript:silhaeng();'>
 <input type="button" value="stop" onclick='meomchum = true;'>
 <input type="button" value="1 step" onclick='javascript:dan_gye(true);'>
 <input type="button" value="clear output" onclick='javascript:document.forms[0].output.value="";'><br/>
-<textarea name="input" rows="10" cols="80" style="scrollbar=both;"></textarea><br/>
-<textarea name="output" rows="10" cols="80" style="scrollbar=both;"></textarea>
+<textarea name="input" rows="5" cols="40" style="scrollbar=both;"></textarea><br/>
+<textarea name="output" rows="5" cols="40" style="scrollbar=both;"></textarea>
 </td>
 <td valign="top">
 <input type="checkbox" name="debug" checked="checked" onclick='javascript:debug=document.forms[0].debug.checked;'>Debug<br/>
-<textarea name="dumps" rows="31" cols="10" style="scrollbar=none;"></textarea>
+<textarea name="dumps" rows="21" cols="20" style="scrollbar=none;"></textarea>
 </td>
 </tr>
 </table>
