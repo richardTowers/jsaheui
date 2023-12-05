@@ -5,6 +5,74 @@ batchim = new Array(" ", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ",
 batchim_hoek = new Array(0, 2, 4, 4, 2, 5, 5, 3, 5, 7, 9, 9, 7, 9, 9, 8, 4, 4, 6, 2, 4, 1, 3, 4, 3, 4, 4, 3);
 required_elem = new Array(0, 0, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 2, 0, 1, 0, 2, 2, 0);
 
+var firstConsonantInstructions = {
+  'ᄋ': 'null instruction. The momentum is immediately updated by the vowel and the cursor moves in that direction without performing any other action.',
+  'ᄒ': 'terminate instruction. The cursor stops at the character and the program terminates.',
+  'ᄃ': 'is the addition instruction. The cursor pops two values from the current storage and pushes their sum.',
+  'ᄄ': 'is the multiplication instruction. The cursor pops two values from the current storage and pushes their product.',
+  'ᄂ': 'is the division instruction. The cursor pops two values from the current storage, performs integer division of the second popped element by the first popped element (second//first), and pushes the result.',
+  'ᄐ': 'is the subtraction instruction. The cursor pops two values from the current storage, subtracts the first popped element from the second popped element (second-first), and pushes the result.',
+  'ᄅ': 'is the modulo instruction. The cursor pops two values from the current storage, calculates the second popped element modulo the first popped element (second%first), and pushes the result.',
+  'ᄆ': 'is the pop instruction. The cursor pops a value from the current storage. The final consonants have the following effects: If the final consonant is ㅇ, the cursor pops a value from the current storage and prints it as an integer. If the final consonant is ㅎ, the cursor pops a value from the current storage and prints the character corresponding the value in UTF-8. All other final consonants (including the empty case) have no effect.',
+  'ᄇ': 'is the push instruction. The cursor pushes a value to the current storage. The value to push is specified by the final consonant: If the final consonant is ㅇ, an integer is received from standard input and pushed to the current storage. If the final consonant is ㅎ, a UTF-8 character is received from standard input and its corresponding integer value is pushed to the current storage. For all other final consonants, the integer value corresponding to the number of strokes required to draw the consonant is pushed to the current storage. The empty final consonant has value 0.',
+  'ᄈ': 'is the duplicate instruction.',
+  'ᄑ': 'is the swap instruction.',
+  'ᄉ': 'is the storage selection instruction. The current storage is changed to the storage mapped to by the final consonant.',
+  'ᄊ': 'is storage transfer instruction. The current storage is popped and the returned value is pushed into the storage mapped to by the final consonant.',
+  'ᄌ': 'is the compare instruction. Two values are popped from the current storage. If the latter value is greater than or equal to the former value, a 1 is pushed to the current storage, otherwise, a 0 is pushed.',
+  'ᄎ': 'is the fork instruction. A value is popped from the current storage. If the value is non-zero, the cursor moves as is specified by the vowel. If the value is zero, the current momentum is reversed before the vowel is consulted.',
+}
+var vowelInstructions = {
+  'ᅡ': 'momentum (0,1)',
+  'ᅥ': 'momentum (0,-1)',
+  'ᅩ': 'momentum (-1,0)',
+  'ᅮ': 'momentum (1,0)',
+  'ᅣ': 'momentum (0,2)',
+  'ᅧ': 'momentum (0,-2)',
+  'ᅭ': 'momentum (-2,0)',
+  'ᅲ': 'momentum (2,0)',
+  'ᅳ': 'reflects vertical momentum.',
+  'ᅵ': 'reflects horizontal momentum.',
+  'ᅴ': 'reflects both vertical and horizontal momentum',
+  'ᅢ': 'leaves momentum unchanged',
+  'ᅦ': 'leaves momentum unchanged',
+  'ᅤ': 'leaves momentum unchanged',
+  'ᅨ': 'leaves momentum unchanged',
+  'ᅪ': 'leaves momentum unchanged',
+  'ᅫ': 'leaves momentum unchanged',
+  'ᅬ': 'leaves momentum unchanged',
+  'ᅯ': 'leaves momentum unchanged',
+  'ᅰ': 'leaves momentum unchanged',
+  'ᅱ': 'leaves momentum unchanged',
+}
+var finalConsonantInstructions = {
+  'ᆨ': '2',
+  'ᆫ': '2',
+  'ᆮ': '3',
+  'ᆯ': '5',
+  'ᆷ': '4',
+  'ᆸ': '4',
+  'ᆺ': '2',
+  'ᆽ': '3',
+  'ᆾ': '4',
+  'ᆿ': '3',
+  'ᇀ': '4',
+  'ᇁ': '4',
+  'ᆩ': '4',
+  'ᆪ': '4',
+  'ᆬ': '5',
+  'ᆭ': '5',
+  'ᆰ': '7',
+  'ᆱ': '9',
+  'ᆲ': '9',
+  'ᆳ': '7',
+  'ᆴ': '9',
+  'ᆵ': '9',
+  'ᆶ': '8',
+  'ᆹ': '6',
+  'ᆻ': '4',
+}
+
 //변수, variables
 var code_gonggan = new Array; //codespace
 var stack = new Array(28);
@@ -47,7 +115,23 @@ function output(obj){
 }
 
 function debug_sseo(){ //write debug info
-  str = msg_coordinate + "(" + x + ", " + y + ")" + '\n' + msg_character + code_gonggan[y].charAt(x) + '\n';
+  var character = code_gonggan[y].charAt(x)
+  var bits = Array.from(character.normalize('NFD'))
+  var explanations = []
+  if (bits.length === 2) {
+    explanations = [
+      firstConsonantInstructions[bits[0]],
+      vowelInstructions[bits[1]]
+    ]
+  } else if (bits.length === 3) {
+    explanations = [
+      firstConsonantInstructions[bits[0]],
+      vowelInstructions[bits[1]],
+      finalConsonantInstructions[bits[2]],
+    ]
+  }
+  str = msg_coordinate + "(" + x + ", " + y + ")" + '\n' + msg_character + character + '\n' +
+    "Bits: " + bits + '\n' + "Explanations: " + explanations + '\n'
   for(i=0; i<28; i++){
     if(i == stack_index) str += '>';
     stack[i].reverse();
